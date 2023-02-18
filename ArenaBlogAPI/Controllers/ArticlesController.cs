@@ -105,6 +105,16 @@ namespace ArenaBlogAPI.Controllers
 
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+
         private bool ArticlesExists(int id)
         {
             return db.Articles.Count(e => e.ID == id) > 0;

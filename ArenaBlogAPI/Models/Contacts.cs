@@ -16,7 +16,7 @@ namespace ArenaBlogAPI.Models
         [Required]
         public string Phone { get; set; }
         [Required]
-        public string Message { get; set; }
+        public string Content { get; set; }
 
     }
 }
