@@ -138,4 +138,16 @@ pre {
     .article-body {
         width: 100% !important;
     }
+
+    .article-card {
+        width: 100% !important;
+        display: grid !important;
+    }
+
+    .article-image {
+        height: 160px !important;
+        overflow: hidden !important;
+        width: 100% !important;
+    }
+
 }
