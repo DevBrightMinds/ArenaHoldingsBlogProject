@@ -21,34 +21,51 @@ namespace ArenaBlogAPI.Controllers
         public ErrorReporting GetContacts()
         {
 
-            List<Contacts> ContactsList = db.Contacts.ToList();
+            try
+            {
+                List<Contacts> ContactsList = db.Contacts.ToList();
 
-            return new ErrorReporting() { Error = false, ErrorDetail = null, Results = ContactsList };
+                return new ErrorReporting() { Error = false, ErrorDetail = null, Results = ContactsList };
+            }
+            catch (Exception e)
+            {
+                return new ErrorReporting() { Error = true, ErrorDetail = e.Message, Results = null };
+            }
 
         }
 
         // POST: api/Contacts
         public ErrorReporting PostContacts(Contacts contacts)
         {
-            var existingEntry = GetExisitingEntry(contacts.Email);
+          try
+          {
+                Contacts contact = GetExisitingEntry(contacts.Email);
 
-            if (!ModelState.IsValid)
-            {
-                return new ErrorReporting() { Error = true, ErrorDetail = "Please fill in all required fields.", Results = null };
+                if (!ModelState.IsValid)
+                {
+                    return new ErrorReporting() { Error = true, ErrorDetail = "Please fill in all required fields.", Results = null };
 
-            } else if (!IsValidEmail(contacts.Email)) {
+                }
+                else if (!IsValidEmail(contacts.Email))
+                {
 
-                return new ErrorReporting() { Error = true, ErrorDetail = "Please provide a valid email address.", Results = null };
+                    return new ErrorReporting() { Error = true, ErrorDetail = "Please provide a valid email address.", Results = null };
 
-            } else if (existingEntry != null)
-            {
-                return new ErrorReporting() { Error = true, ErrorDetail = "That email address '" + contacts.Email + "' has already been used.", Results = null };
-            }
+                }
+                else if (contact != null)
+                {
+                    return new ErrorReporting() { Error = true, ErrorDetail = "That email address '" + contacts.Email + "' has already been used.", Results = null };
+                }
 
-            db.Contacts.Add(contacts);
-            db.SaveChanges();
+                db.Contacts.Add(contacts);
+                db.SaveChanges();
 
-            return new ErrorReporting() { Error = false, ErrorDetail = null, Results = contacts.ID };
+                return new ErrorReporting() { Error = false, ErrorDetail = null, Results = contacts.ID };
+          }
+          catch (Exception e)
+          {
+                return new ErrorReporting() { Error = true, ErrorDetail = e.Message, Results = null };
+          }
         }
 
         public Contacts GetExisitingEntry(string email)
