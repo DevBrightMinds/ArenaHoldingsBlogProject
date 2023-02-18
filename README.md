@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Getting Started
 
 This project is made up of two sections, the back and front end. The backend is in C# and the front end is in React TypeScript.
 The backend was written in C# as per request.
