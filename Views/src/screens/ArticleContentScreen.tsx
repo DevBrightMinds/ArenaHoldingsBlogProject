@@ -31,7 +31,7 @@ const ArticleContentScreen: React.FC<{}> = (): JSX.Element => {
                         <p style={{ margin: 0, color: "red" }}>{Article.DateCreated}</p>
                     </div>
                 </div>
-                <div className="article-body" style={{ width: "40%", padding: "10px 0 0 0" }}>
+                <div className="article-body" style={{ width: "40%", padding: "10px 0 0 0", textAlign: "justify" }}>
                     <pre>{Article.Content}</pre>
                 </div>
                 <button style={{ margin: "10px 0 10px 0" }} onClick={closeArticle} className="btn btn-danger">Close</button>
