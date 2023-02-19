@@ -97,7 +97,7 @@ const App: React.FC<{}> = (): JSX.Element => {
                             overflow: "hidden"
                         }}>
                             <div className="article-image" style={{ width: "150px", height: "50px" }}>
-                                <img className="card-img-top" style={{ height: "160px", objectFit: "cover" }} src={article.ImageUrl} alt="Card image cap" />
+                                <img className="card-img-top" style={{ height: "170px", objectFit: "cover" }} src={article.ImageUrl} alt="Card image cap" />
                             </div>
                             <div className="article-content" style={{ padding: "10px", width: "100%" }}>
                                 <h5 className="card-title" style={{ margin: 0 }}>{article.ArticleName}</h5>

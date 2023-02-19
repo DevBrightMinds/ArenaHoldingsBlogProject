@@ -19,7 +19,8 @@ const ResultModal: React.FC<{
                 display: status ? "block" : "none",
                 transform: "translate(-50%, 0%)",
                 transition: "all .5s",
-                zIndex: 999
+                zIndex: 999,
+                boxShadow: "1px 1px 1px #cccccc61"
             }}>
                 <div className="modal-header" style={{ padding: 10, backgroundColor: "#333333", color: "#ffffff" }}>
                     <h4>{heading}</h4>
