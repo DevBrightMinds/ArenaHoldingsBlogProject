@@ -7,11 +7,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.Http.Description;
 using ArenaBlogAPI.Models;
 
 namespace ArenaBlogAPI.Controllers
 {
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ArticlesController : ApiController
     {
         private DatabaseContext db = new DatabaseContext();
@@ -20,90 +22,134 @@ namespace ArenaBlogAPI.Controllers
         public ErrorReporting GetArticles()
         {
             
-            List<Articles> ArticlesList = db.Articles.ToList();
+            try
+            {
+                List<Articles> ArticlesList = db.Articles.ToList();
 
-            return new ErrorReporting() { Error = false, ErrorDetail = null, Results = ArticlesList };
+                return new ErrorReporting() { Error = false, ErrorDetail = null, Results = ArticlesList };
+            }
+            catch (Exception e)
+            {
+                return new ErrorReporting() { Error = true, ErrorDetail = e.Message, Results = null };
+            }
       
         }
 
         // GET: api/Articles/5
         public ErrorReporting GetArticles(int id)
         {
-            Articles articles = db.Articles.FirstOrDefault(article => article.ID == id);
-            if (articles == null)
+            try
             {
+                Articles articles = db.Articles.FirstOrDefault(article => article.ID == id);
+                if (articles == null)
+                {
 
-                return new ErrorReporting() { Error = true, ErrorDetail = NotFound(), Results =  null};
+                    return new ErrorReporting() { Error = true, ErrorDetail = NotFound(), Results = null };
+                }
+
+                return new ErrorReporting() { Error = false, ErrorDetail = null, Results = articles };
             }
-
-            return new ErrorReporting() { Error = false, ErrorDetail = null, Results = articles };
+            catch(Exception e)
+            {
+                return new ErrorReporting() { Error = true, ErrorDetail = e.Message, Results = null };
+            }
 
         }
 
         // PUT: api/Articles/5
         public ErrorReporting PutArticles(int id, Articles articles)
         {
-            if (!ModelState.IsValid)
-            {
-                return new ErrorReporting() { Error = true, ErrorDetail = BadRequest(ModelState), Results =  null};
-            }
-
-            if (id != articles.ID)
-            {
-                return new ErrorReporting() { Error = true, ErrorDetail = BadRequest(), Results = null };
-            }
-
-            db.Entry(articles).State = EntityState.Modified;
-
             try
             {
-                db.SaveChanges();
+                if (!ModelState.IsValid)
+                {
+                    return new ErrorReporting() { Error = true, ErrorDetail = BadRequest(ModelState), Results = null };
+                }
+
+                if (id != articles.ID)
+                {
+                    return new ErrorReporting() { Error = true, ErrorDetail = BadRequest(), Results = null };
+                }
+
+                db.Entry(articles).State = EntityState.Modified;
+
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ArticlesExists(id))
+                    {
+                        return new ErrorReporting() { Error = true, ErrorDetail = NotFound(), Results = null };
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return new ErrorReporting() { Error = false, ErrorDetail = null, Results = id };
             }
-            catch (DbUpdateConcurrencyException)
+            catch(Exception e)
             {
-                if (!ArticlesExists(id))
-                {
-                    return new ErrorReporting() { Error = true, ErrorDetail = NotFound(), Results = null };
-                }
-                else
-                {
-                    throw;
-                }
+                return new ErrorReporting() { Error = true, ErrorDetail = e.Message, Results = null };
             }
-
-            return new ErrorReporting() { Error = false, ErrorDetail = null, Results = id };
-
         }
 
         // POST: api/Articles
         public ErrorReporting PostArticles(Articles articles)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return new ErrorReporting() { Error = true, ErrorDetail = BadRequest(ModelState), Results = null };
+                if (!ModelState.IsValid)
+                {
+                    return new ErrorReporting() { Error = true, ErrorDetail = "Please fill in all required fields.", Results = null };
+                }
+
+                db.Articles.Add(articles);
+                db.SaveChanges();
+
+                return new ErrorReporting() { Error = false, ErrorDetail = null, Results = articles.ID };
             }
-
-            db.Articles.Add(articles);
-            db.SaveChanges();
-
-            return new ErrorReporting() { Error = false, ErrorDetail = null, Results = articles.ID };
+            catch (Exception e)
+            {
+                return new ErrorReporting() { Error = true, ErrorDetail = e.Message, Results = null };
+            }
         }
 
         // DELETE: api/Articles/5
         public ErrorReporting DeleteArticles(int id)
         {
-            Articles articles = db.Articles.FirstOrDefault(article => article.ID == id);
-            if (articles == null)
+            try
             {
-                return new ErrorReporting() { Error = true, ErrorDetail = NotFound(), Results = null };
+                Articles articles = db.Articles.FirstOrDefault(article => article.ID == id);
+                if (articles == null)
+                {
+                    return new ErrorReporting() { Error = true, ErrorDetail = NotFound(), Results = null };
+                }
+
+                db.Articles.Remove(articles);
+                db.SaveChanges();
+
+                return new ErrorReporting() { Error = false, ErrorDetail = null, Results = id };
+            } 
+            catch (Exception e)
+            {
+                return new ErrorReporting() { Error = true, ErrorDetail = e.Message, Results = null };
             }
 
-            db.Articles.Remove(articles);
-            db.SaveChanges();
-
-            return new ErrorReporting() { Error = false, ErrorDetail = null, Results = id };
-
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
 
         private bool ArticlesExists(int id)
         {
